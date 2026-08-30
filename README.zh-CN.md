@@ -21,20 +21,19 @@ DSH seam 需要的 `WebSource` / `WebFetchBody`。
 - `apiKey`：字面密钥（可选，secret）。
 - `apiKeyEnv`：credential ref，默认 `NINE_ROUTER_API_KEY`。
 
-## 接入步骤
+## 安装
 
-1. 在 DSH profile 目录中使用 pnpm 从 GitHub 安装：
-   ```bash
-   pnpm add github:rebron1900/dsh-web-search-9router
-   ```
-   或在 profile 的 `package.json` 中加入：
-   ```json
-   "dsh-web-search-9router": "github:rebron1900/dsh-web-search-9router"
-   ```
-2. 在 `dsh.profile.bundles` 加入 `"dsh-web-search-9router"`。
-3. 在 `cordis.patch.yml` 将 `web` 的 `searchProvider` 和 `fetchProvider` 设为 `9router`；不需要禁用 `web-search-deepseek`。
-4. 在 `~/.dsh/.credentials.yaml` 存 `NINE_ROUTER_API_KEY`，或在本插件 settings 段设置字面 `apiKey`。
-5. 重启 `dsh web` 生效。禁用 `web-search-deepseek` 会按设计隐藏它的设置卡片。
+```bash
+npx @deepseek-ai/dsh plugin --profile web add github:rebron1900/dsh-web-search-9router
+```
+
+重启 Harness，然后强制刷新浏览器。在 `cordis.patch.yml` 中将 `searchProvider` 和 `fetchProvider` 配置为 `9router`，并在 `~/.dsh/.credentials.yaml` 中配置 `NINE_ROUTER_API_KEY`，或在插件设置中设置 `apiKey`。
+
+如需锁定可复现的安装版本，在仓库地址后追加 commit SHA：
+
+```bash
+npx @deepseek-ai/dsh plugin --profile web add github:rebron1900/dsh-web-search-9router#44d1936
+```
 
 ## 测试
 
