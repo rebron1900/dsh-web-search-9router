@@ -13,7 +13,7 @@ DSH seam 需要的 `WebSource` / `WebFetchBody`。
 
 ## 配置
 
-- `baseURL`：默认 `https://napi.190102.xyz:4433/v1`。
+- `baseURL`：9router 兼容 API 的基础地址，请配置为你自己的服务地址。
 - `searchModel`：默认 `search-combo`。
 - `fetchModel`：默认 `fetch-combo`。
 - `searchType`：默认 `web`。
