@@ -1,0 +1,8 @@
+# dsh-web-search-9router — bundle patch.
+# Insert this plugin's cordis entry so its apply() runs and registers the
+# 9router search + fetch providers on ctx.web.
+- insert:
+    - id: web-search-9router
+      name: dsh-web-search-9router
+      config:
+        apiKeyEnv: NINE_ROUTER_API_KEY
