@@ -23,9 +23,13 @@ DSH seam 需要的 `WebSource` / `WebFetchBody`。
 
 ## 接入步骤
 
-1. 在 DSH profile 的 `package.json` 加依赖：
+1. 在 DSH profile 目录中使用 pnpm 从 GitHub 安装：
+   ```bash
+   pnpm add github:rebron1900/dsh-web-search-9router
+   ```
+   或在 profile 的 `package.json` 中加入：
    ```json
-   "dsh-web-search-9router": "link:/home/rebron1900/workspace/projects/active/dsh-web-search-9router"
+   "dsh-web-search-9router": "github:rebron1900/dsh-web-search-9router"
    ```
 2. 在 `dsh.profile.bundles` 加入 `"dsh-web-search-9router"`。
 3. 在 `cordis.patch.yml` 将 `web` 的 `searchProvider` 和 `fetchProvider` 设为 `9router`；不需要禁用 `web-search-deepseek`。
