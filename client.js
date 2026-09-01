@@ -4,7 +4,7 @@ window.__ModuleLoader__.load({
     const module = { exports: {} };
     const exports = module.exports;
     const React = require("react");
-    const { createSnapshotStore } = require("@deepseek-ai/dsh-client-runtime/client");
+    const { createSnapshotStore } = require("@deepseek-ai/dsh-client-store");
     const { useMemo, useSyncExternalStore } = React;
 
     const NAMESPACE = "web-search-9router";
@@ -142,9 +142,9 @@ window.__ModuleLoader__.load({
     }
 
     class Controller {
-      constructor(scope, api) {
+      constructor(scope, remote) {
         this.scope = scope;
-        this.api = api;
+        this.remote = remote;
         this.staged = new Map();
         this.credential = { ref: "", configured: false, writable: true };
         this.saving = false;
@@ -173,12 +173,13 @@ window.__ModuleLoader__.load({
       publish() { this.store.set(this.project()); }
       async readCredential() {
         const ref = this.scope.getSnapshot().value?.apiKeyEnv ?? "NINE_ROUTER_API_KEY";
-        if (!this.api?.credentials?.describe) return;
+        if (!this.remote?.credentials?.describe) return;
         this.credential = { ref, configured: false, writable: true, pending: true };
         this.publish();
         try {
-          const response = await this.api.credentials.describe({ refs: [ref] });
-          const view = response?.result?.value?.credentials?.[ref];
+          const response = await this.remote.credentials.describe([ref]);
+          if (!response.ok) return;
+          const view = response.value?.[ref];
           if (ref === (this.scope.getSnapshot().value?.apiKeyEnv ?? "NINE_ROUTER_API_KEY")) {
             this.credential = { ref, configured: view?.configured ?? false, writable: view?.writable ?? true };
             this.publish();
@@ -186,9 +187,10 @@ window.__ModuleLoader__.load({
         } catch {}
       }
       async writeCredential(value) {
-        if (!this.api?.credentials?.set) return false;
+        if (!this.remote?.credentials?.set) return false;
         const ref = this.scope.getSnapshot().value?.apiKeyEnv ?? "NINE_ROUTER_API_KEY";
-        await this.api.credentials.set({ ref, value });
+        const response = await this.remote.credentials.set(ref, value);
+        if (!response.ok) return false;
         await this.readCredential();
         return this.credential.configured;
       }
@@ -222,11 +224,11 @@ window.__ModuleLoader__.load({
       }
     }
 
-    const inject = ["slots", "locale", "settingsScope", "connection"];
+    const inject = ["slots", "locale", "remote", "remote.credentials", "settingsScope"];
     function apply(ctx) {
       ctx.effect(() => ctx.locale.register(NAMESPACE, LOCALE), "web-search-9router: dictionaries");
       const t = ctx.locale.bind(NAMESPACE);
-      const controller = new Controller(ctx.settingsScope.bind({ namespace: NAMESPACE }), ctx.get("connection")?.api);
+      const controller = new Controller(ctx.settingsScope.bind({ namespace: NAMESPACE }), ctx.remote);
       ctx.slots.inject("settings.plugin.item", () => ctx.slots.register({
         name: "settings.plugin.item",
         key: NAMESPACE,

@@ -1,6 +1,5 @@
 import z from "@deepseek-ai/schemastery";
 import { credentialRef } from "@deepseek-ai/dsh-credentials";
-import { installSettingsSection, settingsNamespace } from "@deepseek-ai/dsh-settings";
 import { launchEnvironmentOf } from "@deepseek-ai/dsh-launch-environment";
 import { WebError } from "@deepseek-ai/dsh-web";
 
@@ -274,7 +273,7 @@ const Config = z.object({
 	timeoutMs: z.number().step(1).min(1).default(DEFAULT_TIMEOUT_MS)
 });
 const SEARCH_BASE_URL_ENV = "NINE_ROUTER_BASE_URL";
-const SETTINGS_NAMESPACE = settingsNamespace("web-search-9router");
+const SETTINGS_NAMESPACE = "web-search-9router";
 
 function resolveOptions(ctx, config) {
 	const apiKeyEnv = credentialRef(config.apiKeyEnv ?? DEFAULT_API_KEY_ENV);
@@ -300,9 +299,11 @@ function resolveOptions(ctx, config) {
 /** Register the 9router search + fetch providers with `ctx.web`. */
 function apply(ctx, config) {
 	let current = () => config;
-	installSettingsSection(ctx, SETTINGS_NAMESPACE, Config, config, {
-		setSource: (source) => { current = source; },
-		onChange: () => {}
+	ctx.inject(["settings"], (settingsCtx) => {
+		settingsCtx.settings.installSection(ctx, SETTINGS_NAMESPACE, Config, config, {
+			setSource: (source) => { current = source; },
+			onChange: () => {}
+		});
 	});
 	ctx.web.registerSearchProvider(new NineRouterSearchProvider(() => resolveOptions(ctx, current())));
 	ctx.web.registerFetchProvider(new NineRouterFetchProvider(() => resolveOptions(ctx, current())));
