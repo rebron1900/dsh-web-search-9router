@@ -134,7 +134,7 @@ var NineRouterSearchProvider = class {
 			throw new WebError(`9router search credential resolution failed: ${String(error)}`, "WEB_PROVIDER_ERROR", { cause: error });
 		}
 		if (resolved !== void 0 && resolved.length > 0) return resolved;
-		throw new WebError(`9router search has no API key for "${options.apiKeyEnv ?? "NINE_ROUTER_API_KEY"}"; store it through the credentials service or set a literal "apiKey" in the web-search-9router config`, "WEB_PROVIDER_CREDENTIAL_MISSING");
+		throw new WebError(`9router search has no API key for "${options.apiKeyEnv ?? "NINE_ROUTER_API_KEY"}"; store it through the credentials service`, "WEB_PROVIDER_CREDENTIAL_MISSING");
 	}
 };
 
@@ -220,7 +220,7 @@ var NineRouterFetchProvider = class {
 			throw new WebError(`9router fetch credential resolution failed: ${String(error)}`, "WEB_PROVIDER_ERROR", { cause: error });
 		}
 		if (resolved !== void 0 && resolved.length > 0) return resolved;
-		throw new WebError(`9router fetch has no API key for "${options.apiKeyEnv ?? "NINE_ROUTER_API_KEY"}"; store it through the credentials service or set a literal "apiKey" in the web-search-9router config`, "WEB_PROVIDER_CREDENTIAL_MISSING");
+		throw new WebError(`9router fetch has no API key for "${options.apiKeyEnv ?? "NINE_ROUTER_API_KEY"}"; store it through the credentials service`, "WEB_PROVIDER_CREDENTIAL_MISSING");
 	}
 };
 
@@ -263,19 +263,19 @@ const name = "web-search-9router";
 const inject = ["web"];
 const DEFAULT_API_KEY_ENV = "NINE_ROUTER_API_KEY";
 const Config = z.object({
-	apiKey: z.string().role("secret"),
-	apiKeyEnv: z.string().role("credential-ref").default(DEFAULT_API_KEY_ENV),
-	baseURL: z.string().default(DEFAULT_BASE_URL),
-	searchModel: z.string().default(DEFAULT_SEARCH_MODEL),
-	fetchModel: z.string().default(DEFAULT_FETCH_MODEL),
-	searchType: z.string().default(DEFAULT_SEARCH_TYPE),
-	maxResults: z.number().step(1).min(1).default(DEFAULT_MAX_RESULTS),
-	timeoutMs: z.number().step(1).min(1).default(DEFAULT_TIMEOUT_MS)
+	apiKey: z.string().role("secret").volatile(),
+	apiKeyEnv: z.string().role("credential-ref").default(DEFAULT_API_KEY_ENV).volatile(),
+	baseURL: z.string().default(DEFAULT_BASE_URL).volatile(),
+	searchModel: z.string().default(DEFAULT_SEARCH_MODEL).volatile(),
+	fetchModel: z.string().default(DEFAULT_FETCH_MODEL).volatile(),
+	searchType: z.string().default(DEFAULT_SEARCH_TYPE).volatile(),
+	maxResults: z.number().step(1).min(1).default(DEFAULT_MAX_RESULTS).volatile(),
+	timeoutMs: z.number().step(1).min(1).default(DEFAULT_TIMEOUT_MS).volatile()
 });
 const SEARCH_BASE_URL_ENV = "NINE_ROUTER_BASE_URL";
-const SETTINGS_NAMESPACE = "web-search-9router";
 
 function resolveOptions(ctx, config) {
+	const launchEnvironment = launchEnvironmentOf(ctx);
 	const apiKeyEnv = credentialRef(config.apiKeyEnv ?? DEFAULT_API_KEY_ENV);
 	const literalApiKey = config.apiKey !== void 0 && config.apiKey.length > 0 ? config.apiKey : void 0;
 	return {
@@ -283,11 +283,11 @@ function resolveOptions(ctx, config) {
 		resolveApiKey: async () => {
 			const credentials = ctx.get("credentials");
 			if (credentials !== void 0) return (await credentials.resolve(apiKeyEnv))?.value;
-			const ambient = launchEnvironmentOf(ctx).get(apiKeyEnv);
+			const ambient = launchEnvironment.get(apiKeyEnv);
 			return ambient !== void 0 && ambient.value.length > 0 ? ambient.value : void 0;
 		},
 		apiKeyEnv,
-		baseURL: config.baseURL ?? launchEnvironmentOf(ctx).get(SEARCH_BASE_URL_ENV)?.value ?? DEFAULT_BASE_URL,
+		baseURL: config.baseURL ?? launchEnvironment.get(SEARCH_BASE_URL_ENV)?.value ?? DEFAULT_BASE_URL,
 		searchModel: config.searchModel ?? DEFAULT_SEARCH_MODEL,
 		fetchModel: config.fetchModel ?? DEFAULT_FETCH_MODEL,
 		searchType: config.searchType ?? DEFAULT_SEARCH_TYPE,
@@ -296,14 +296,20 @@ function resolveOptions(ctx, config) {
 	};
 }
 
-/** Register the 9router search + fetch providers with `ctx.web`. */
+/** Register the 9router providers and opt out of the automatic settings page. */
 function apply(ctx, config) {
-	let current = () => config;
-	ctx.inject(["settings"], (settingsCtx) => {
-		settingsCtx.settings.installSection(ctx, SETTINGS_NAMESPACE, Config, config, {
-			setSource: (source) => { current = source; },
-			onChange: () => {}
-		});
+	ctx.inject(["settings"], (child) => {
+		child.effect(() => child.settings.configure({ auto: false }, ctx.fiber));
+	});
+	const current = () => ({
+		apiKey: config.apiKey.get(),
+		apiKeyEnv: config.apiKeyEnv.get(),
+		baseURL: config.baseURL.get(),
+		searchModel: config.searchModel.get(),
+		fetchModel: config.fetchModel.get(),
+		searchType: config.searchType.get(),
+		maxResults: config.maxResults.get(),
+		timeoutMs: config.timeoutMs.get()
 	});
 	ctx.web.registerSearchProvider(new NineRouterSearchProvider(() => resolveOptions(ctx, current())));
 	ctx.web.registerFetchProvider(new NineRouterFetchProvider(() => resolveOptions(ctx, current())));
@@ -315,8 +321,10 @@ export {
 	DEFAULT_API_KEY_ENV,
 	DEFAULT_BASE_URL,
 	DEFAULT_FETCH_MODEL,
+	DEFAULT_MAX_RESULTS,
 	DEFAULT_SEARCH_MODEL,
 	DEFAULT_SEARCH_TYPE,
+	DEFAULT_TIMEOUT_MS,
 	PROVIDER_ID,
 	NineRouterFetchProvider,
 	NineRouterSearchProvider,

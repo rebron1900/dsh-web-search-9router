@@ -3,8 +3,9 @@
 > **Web search & fetch for DeepSeek Harness, powered by 9router.**
 > Wires the native `web_search` and `web_fetch` tools into 9router's `/v1/search` and `/v1/web/fetch` endpoints — no server-side search tool required.
 
-[![Version](https://img.shields.io/badge/version-0.1.1-green)](https://github.com/lordraiden/dsh-web-search-9router/releases)
+[![Version](https://img.shields.io/badge/version-0.2.3-green)](https://github.com/lordraiden/dsh-web-search-9router/releases)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
+[![DSH](https://img.shields.io/badge/DSH-%3E%3D0.2.0--rc.2-brightgreen)](https://github.com/deepseek-ai/DeepSeek-Harness)
 [![Node.js](https://img.shields.io/badge/node-%3E%3D20-brightgreen)](https://nodejs.org)
 [![ESM](https://img.shields.io/badge/module-ESM-8e44ad)](https://nodejs.org/api/esm.html)
 [![GitHub stars](https://img.shields.io/github/stars/lordraiden/dsh-web-search-9router?style=social)](https://github.com/lordraiden/dsh-web-search-9router)
@@ -17,8 +18,8 @@
 
 - 🔎 **Search provider** — routes DSH's native `web_search` through 9router's `/v1/search`, returning deduplicated `WebSource` results (title, snippet, published date).
 - 📄 **Fetch provider** — routes DSH's native `web_fetch` through 9router's `/v1/web/fetch`, returning clean text/markdown bodies.
-- 🎛️ **Settings card** — a native DSH settings panel for the API key, base URL, models, and limits.
-- 🔐 **Credentials-aware** — resolves the API key from DSH's credentials service (`NINE_ROUTER_API_KEY`) or a literal config value; never committed to the repo.
+- 🎛️ **Bundle settings** — configure the API key, base URL, models, and limits directly on the plugin's bundle detail page.
+- 🔐 **Credentials-aware** — stores API keys through DSH's credentials service and resolves the configured credential reference (`NINE_ROUTER_API_KEY` by default).
 - 🧱 **Zero build** — pure ESM, plain JavaScript, no bundler required.
 
 ## 🧭 Why this plugin
@@ -57,20 +58,28 @@ Errors surface as machine-routable `WebError` codes (`WEB_PROVIDER_ERROR`, `WEB_
 
 ## 🚀 Quick start
 
+**Requirements:** DSH `>=0.2.0-rc.2` and Node.js 20 or later.
+
 **1. Install the plugin**
 
 ```bash
 npx @deepseek-ai/dsh plugin --profile web add github:lordraiden/dsh-web-search-9router
 ```
 
-**2. Wire it up**
+**2. Select the providers**
 
-- In your profile's `cordis.patch.yml`, set `searchProvider` and `fetchProvider` to `9router`.
-- Store your key in `~/.dsh/.credentials.yaml` as `NINE_ROUTER_API_KEY`, or set a literal `apiKey` in the plugin settings.
+In your profile's `cordis.patch.yml`, set `searchProvider` and `fetchProvider` to `9router`:
 
-**3. Restart & refresh**
+```yaml
+- id: web
+  config:
+    searchProvider: 9router
+    fetchProvider: 9router
+```
 
-Restart Harness, then hard-refresh the browser. The `9router` options appear in the web settings card.
+**3. Configure the plugin**
+
+Restart DSH and refresh the browser. Open **Plugins**, select **dsh-web-search-9router**, and configure it directly on the bundle detail page. Entering an API key stores it in DSH credentials under the selected credential reference; the key is never written to plugin settings.
 
 > 🔒 **Reproducible installs** — append a commit SHA to pin an exact version:
 >
@@ -88,8 +97,8 @@ Restart Harness, then hard-refresh the browser. The `9router` options appear in 
 | `searchType` | string | `web` | `search_type` sent to the search endpoint |
 | `maxResults` | number | `8` | Max sources per search |
 | `timeoutMs` | number | `30000` | Per-request timeout |
-| `apiKey` | secret | — | Literal API key (optional) |
-| `apiKeyEnv` | credential-ref | `NINE_ROUTER_API_KEY` | Credentials-service key name |
+| API key | credential | — | Write-only field stored by the DSH credentials service, not in plugin settings |
+| `apiKeyEnv` | credential-ref | `NINE_ROUTER_API_KEY` | Credential reference used to store and resolve the API key |
 
 ## 🧪 Development
 
@@ -103,7 +112,7 @@ pnpm test      # run the test suite (node:test)
 ```text
 dsh-web-search-9router/
 ├── src/index.js       # plugin entry: search + fetch providers
-├── client.js          # settings card
+├── client.js          # bundle detail settings form
 ├── cordis.patch.yml   # bundle patch registering the plugin
 ├── test/              # node --test suite
 └── package.json       # ESM plugin manifest
