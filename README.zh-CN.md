@@ -3,12 +3,12 @@
 > **为 DeepSeek Harness 提供由 9router 背书的网页搜索与抓取。**
 > 将原生 `web_search` 与 `web_fetch` 工具接入 9router 的 `/v1/search` 与 `/v1/web/fetch` 端点 —— 无需服务端搜索工具。
 
-[![Version](https://img.shields.io/badge/version-0.2.3-green)](https://github.com/lordraiden/dsh-web-search-9router/releases)
+[![Version](https://img.shields.io/badge/version-0.2.3-green)](https://github.com/rebron1900/dsh-web-search-9router/releases)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
 [![DSH](https://img.shields.io/badge/DSH-%3E%3D0.2.0--rc.2-brightgreen)](https://github.com/deepseek-ai/DeepSeek-Harness)
 [![Node.js](https://img.shields.io/badge/node-%3E%3D20-brightgreen)](https://nodejs.org)
 [![ESM](https://img.shields.io/badge/module-ESM-8e44ad)](https://nodejs.org/api/esm.html)
-[![GitHub stars](https://img.shields.io/github/stars/lordraiden/dsh-web-search-9router?style=social)](https://github.com/lordraiden/dsh-web-search-9router)
+[![GitHub stars](https://img.shields.io/github/stars/rebron1900/dsh-web-search-9router?style=social)](https://github.com/rebron1900/dsh-web-search-9router)
 
 [🇺🇸 English](./README.md) · 🇨🇳 **简体中文**
 
@@ -63,7 +63,7 @@ DSH 默认的 `web_search` 使用 `web-search-deepseek` provider，它要求上�
 **1. 安装插件**
 
 ```bash
-npx @deepseek-ai/dsh plugin --profile web add github:lordraiden/dsh-web-search-9router
+npx @deepseek-ai/dsh plugin --profile web add github:rebron1900/dsh-web-search-9router
 ```
 
 **2. 选择 provider**
@@ -81,10 +81,10 @@ npx @deepseek-ai/dsh plugin --profile web add github:lordraiden/dsh-web-search-9
 
 重启 DSH 并刷新浏览器。打开**插件**，选择 **dsh-web-search-9router**，即可直接在插件包详情页配置。输入的 API 密钥会按当前凭据引用保存到 DSH 凭据服务，不会写入插件设置。
 
-> 🔒 **可复现安装** — 追加 commit SHA 以锁定精确版本：
+> 🔒 **可复现安装** — 追加发布 tag 以锁定精确版本：
 >
 > ```bash
-> npx @deepseek-ai/dsh plugin --profile web add github:lordraiden/dsh-web-search-9router#44d1936
+> npx @deepseek-ai/dsh plugin --profile web add github:rebron1900/dsh-web-search-9router#v0.2.3
 > ```
 
 ## 🛠️ 配置
@@ -122,12 +122,8 @@ dsh-web-search-9router/
 
 - 📦 **分发** — GitHub 仓库是唯一的分发来源；稳定版本以 `v<version>` GitHub Releases 发布。
 - 📚 **目录** — 已收录于 [awesome-dsh-plugin](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin)。
-- 🐛 **问题与需求** — 请提交 [issue](https://github.com/lordraiden/dsh-web-search-9router/issues)。
+- 🐛 **问题与需求** — 请提交 [issue](https://github.com/rebron1900/dsh-web-search-9router/issues)。
 
 ## 📄 许可证
 
 [MIT](./LICENSE)
-
-## 🙏 致谢
-
-本项目 fork 自 [rebron1900/dsh-web-search-9router](https://github.com/rebron1900/dsh-web-search-9router) —— 感谢原作者为 DeepSeek Harness（DSH）提供 9router 背书的网页搜索与抓取 provider。
