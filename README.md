@@ -3,7 +3,7 @@
 > **Web search & fetch for DeepSeek Harness, powered by 9router.**
 > Wires the native `web_search` and `web_fetch` tools into 9router's `/v1/search` and `/v1/web/fetch` endpoints — no server-side search tool required.
 
-[![Version](https://img.shields.io/badge/version-0.2.3-green)](https://github.com/rebron1900/dsh-web-search-9router/releases)
+[![Version](https://img.shields.io/badge/version-0.2.4-green)](https://github.com/rebron1900/dsh-web-search-9router/releases)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
 [![DSH](https://img.shields.io/badge/DSH-%3E%3D0.2.0--rc.2-brightgreen)](https://github.com/deepseek-ai/DeepSeek-Harness)
 [![Node.js](https://img.shields.io/badge/node-%3E%3D20-brightgreen)](https://nodejs.org)
@@ -66,16 +66,11 @@ Errors surface as machine-routable `WebError` codes (`WEB_PROVIDER_ERROR`, `WEB_
 npx @deepseek-ai/dsh plugin --profile web add github:rebron1900/dsh-web-search-9router
 ```
 
-**2. Select the providers**
+**2. Enable the plugin bundle**
 
-In your profile's `cordis.patch.yml`, set `searchProvider` and `fetchProvider` to `9router`:
+Installing and enabling the bundle automatically selects `9router` for both search and fetch. Disable the whole bundle in **Plugins** to restore the providers selected by the remaining configuration layers (normally `deepseek-official` and `http`).
 
-```yaml
-- id: web
-  config:
-    searchProvider: 9router
-    fetchProvider: 9router
-```
+If you previously selected providers explicitly in your profile, home configuration, or launch overrides, those higher-priority choices still win. Remove the old `id: web` provider config override to let bundle enablement control selection.
 
 **3. Configure the plugin**
 
@@ -84,7 +79,7 @@ Restart DSH and refresh the browser. Open **Plugins**, select **dsh-web-search-9
 > 🔒 **Reproducible installs** — append a release tag to pin an exact version:
 >
 > ```bash
-> npx @deepseek-ai/dsh plugin --profile web add github:rebron1900/dsh-web-search-9router#v0.2.3
+> npx @deepseek-ai/dsh plugin --profile web add github:rebron1900/dsh-web-search-9router#v0.2.4
 > ```
 
 ## 🛠️ Configuration

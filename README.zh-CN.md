@@ -3,7 +3,7 @@
 > **为 DeepSeek Harness 提供由 9router 背书的网页搜索与抓取。**
 > 将原生 `web_search` 与 `web_fetch` 工具接入 9router 的 `/v1/search` 与 `/v1/web/fetch` 端点 —— 无需服务端搜索工具。
 
-[![Version](https://img.shields.io/badge/version-0.2.3-green)](https://github.com/rebron1900/dsh-web-search-9router/releases)
+[![Version](https://img.shields.io/badge/version-0.2.4-green)](https://github.com/rebron1900/dsh-web-search-9router/releases)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
 [![DSH](https://img.shields.io/badge/DSH-%3E%3D0.2.0--rc.2-brightgreen)](https://github.com/deepseek-ai/DeepSeek-Harness)
 [![Node.js](https://img.shields.io/badge/node-%3E%3D20-brightgreen)](https://nodejs.org)
@@ -66,16 +66,11 @@ DSH 默认的 `web_search` 使用 `web-search-deepseek` provider，它要求上�
 npx @deepseek-ai/dsh plugin --profile web add github:rebron1900/dsh-web-search-9router
 ```
 
-**2. 选择 provider**
+**2. 启用插件包**
 
-在 profile 的 `cordis.patch.yml` 中，将 `searchProvider` 与 `fetchProvider` 设为 `9router`：
+安装并启用插件包后，搜索与网页抓取会自动选择 `9router`。在**插件**中停用整个插件包后，会恢复其余配置层选择的提供方（通常是 `deepseek-official` 与 `http`）。
 
-```yaml
-- id: web
-  config:
-    searchProvider: 9router
-    fetchProvider: 9router
-```
+如果此前在 profile、用户级配置或启动覆盖中显式选择过提供方，这些更高优先级的配置仍然生效。删除旧的 `id: web` 提供方配置覆盖，即可让插件包的启用状态控制选择。
 
 **3. 配置插件**
 
@@ -84,7 +79,7 @@ npx @deepseek-ai/dsh plugin --profile web add github:rebron1900/dsh-web-search-9
 > 🔒 **可复现安装** — 追加发布 tag 以锁定精确版本：
 >
 > ```bash
-> npx @deepseek-ai/dsh plugin --profile web add github:rebron1900/dsh-web-search-9router#v0.2.3
+> npx @deepseek-ai/dsh plugin --profile web add github:rebron1900/dsh-web-search-9router#v0.2.4
 > ```
 
 ## 🛠️ 配置
